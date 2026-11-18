@@ -1,10 +1,42 @@
 /* eslint-disable @next/next/no-img-element */
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProductById } from "@/data/products";
+import { getProductById, getAllProducts } from "@/data/products";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+// 1. generateStaticParams: Tells Next.js at build time which [id] pages to pre-render statically (SSG)
+export async function generateStaticParams() {
+  const products = getAllProducts();
+  return products.map((product) => ({
+    id: product.id,
+  }));
+}
+
+// 2. generateMetadata: Dynamically creates SEO title, description, and OpenGraph tags using the route params
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = getProductById(id);
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+      description: "The requested product could not be found.",
+    };
+  }
+
+  return {
+    title: `${product.name} | TechCatalog`,
+    description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: [{ url: product.image, alt: product.name }],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
