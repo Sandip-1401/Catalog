@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getProductById, getAllProducts } from "@/data/products";
+import { FadeIn, MotionCard } from "@/components/motion";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -48,95 +49,108 @@ export default async function ProductDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // 3. Render the professional product detail view
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 py-12 px-6">
       <div className="max-w-5xl mx-auto">
-        <nav className="mb-8 flex items-center gap-2 text-sm text-zinc-400">
-          <Link href="/" className="hover:text-zinc-200 transition">Home</Link>
-          <span>/</span>
-          <Link href="/products" className="hover:text-zinc-200 transition">Products</Link>
-          <span>/</span>
-          <span className="text-zinc-100 font-medium truncate">{product.name}</span>
-        </nav>
+        {/* Breadcrumb Navigation */}
+        <FadeIn direction="down" duration={0.3}>
+          <nav className="mb-8 flex items-center gap-2 text-sm text-zinc-400">
+            <Link href="/" className="hover:text-zinc-200 transition">Home</Link>
+            <span>/</span>
+            <Link href="/products" className="hover:text-zinc-200 transition">Products</Link>
+            <span>/</span>
+            <span className="text-zinc-100 font-medium truncate">{product.name}</span>
+          </nav>
+        </FadeIn>
 
+        {/* Product Showcase */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-zinc-900/40 p-8 rounded-3xl border border-zinc-800 backdrop-blur">
-          <div className="relative aspect-square overflow-hidden rounded-2xl bg-zinc-800 border border-zinc-700/50">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
+          {/* Left Column: Image with slide-in animation */}
+          <FadeIn direction="right" duration={0.4}>
+            <div className="relative aspect-square overflow-hidden rounded-2xl bg-zinc-800 border border-zinc-700/50">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+          </FadeIn>
 
-          <div className="flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-300">
-                  {product.category}
-                </span>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    product.inStock
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                      : "bg-red-500/10 text-red-400 border border-red-500/20"
-                  }`}
-                >
-                  {product.inStock ? "In Stock" : "Out of Stock"}
-                </span>
+          {/* Right Column: Product details with slide-in animation */}
+          <FadeIn direction="left" duration={0.4} delay={0.1}>
+            <div className="flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-300">
+                    {product.category}
+                  </span>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      product.inStock
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        : "bg-red-500/10 text-red-400 border border-red-500/20"
+                    }`}
+                  >
+                    {product.inStock ? "In Stock" : "Out of Stock"}
+                  </span>
+                </div>
+
+                <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white">
+                  {product.name}
+                </h1>
+
+                <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
+                  <span className="text-amber-400 font-semibold">★ {product.rating}</span>
+                  <span>•</span>
+                  <span>{product.reviewCount.toLocaleString()} reviews</span>
+                </div>
+
+                <div className="mt-6 text-4xl font-black text-white">
+                  ${product.price}
+                </div>
+
+                <p className="mt-4 text-sm leading-relaxed text-zinc-300">
+                  {product.description}
+                </p>
+
+                <div className="mt-6 border-t border-zinc-800 pt-6">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Technical Specifications
+                  </h3>
+                  <dl className="mt-3 divide-y divide-zinc-800/60 text-xs">
+                    {Object.entries(product.specs).map(([label, value]) => (
+                      <div key={label} className="flex justify-between py-2">
+                        <dt className="text-zinc-400">{label}</dt>
+                        <dd className="font-medium text-zinc-200">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
               </div>
 
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white">
-                {product.name}
-              </h1>
-
-              <div className="mt-3 flex items-center gap-2 text-sm text-zinc-400">
-                <span className="text-amber-400 font-semibold">★ {product.rating}</span>
-                <span>•</span>
-                <span>{product.reviewCount.toLocaleString()} reviews</span>
-              </div>
-
-              <div className="mt-6 text-4xl font-black text-white">
-                ${product.price}
-              </div>
-
-              <p className="mt-4 text-sm leading-relaxed text-zinc-300">
-                {product.description}
-              </p>
-
-              <div className="mt-6 border-t border-zinc-800 pt-6">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                  Technical Specifications
-                </h3>
-                <dl className="mt-3 divide-y divide-zinc-800/60 text-xs">
-                  {Object.entries(product.specs).map(([label, value]) => (
-                    <div key={label} className="flex justify-between py-2">
-                      <dt className="text-zinc-400">{label}</dt>
-                      <dd className="font-medium text-zinc-200">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
+              <div className="mt-8">
+                <MotionCard>
+                  <button
+                    disabled={!product.inStock}
+                    className={`w-full rounded-xl py-3.5 text-sm font-semibold transition shadow-lg ${
+                      product.inStock
+                        ? "bg-emerald-500 text-black hover:bg-emerald-400 cursor-pointer shadow-emerald-500/20"
+                        : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                    }`}
+                  >
+                    {product.inStock ? "Add to Cart" : "Currently Unavailable"}
+                  </button>
+                </MotionCard>
               </div>
             </div>
-
-            <div className="mt-8">
-              <button
-                disabled={!product.inStock}
-                className={`w-full rounded-xl py-3.5 text-sm font-semibold transition shadow-lg ${
-                  product.inStock
-                    ? "bg-emerald-500 text-black hover:bg-emerald-400 cursor-pointer shadow-emerald-500/20"
-                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                }`}
-              >
-                {product.inStock ? "Add to Cart" : "Currently Unavailable"}
-              </button>
-            </div>
-          </div>
+          </FadeIn>
         </div>
 
-        <p className="mt-4 text-xs text-zinc-500">
-          Try visiting <code className="text-zinc-300">/products/macbook</code> or <code className="text-zinc-300">/products/12345</code> in your browser to see this value update instantly!
-        </p>
+        <FadeIn delay={0.2}>
+          <p className="mt-4 text-xs text-zinc-500">
+            Try visiting <code className="text-zinc-300">/products/macbook-air-m3</code> or <code className="text-zinc-300">/products/12345</code> in your browser to see dynamic routing in action!
+          </p>
+        </FadeIn>
       </div>
     </div>
   );
